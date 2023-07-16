@@ -5,12 +5,12 @@ const folderName: string = `D:\\downloads`;
 const defaultFolderDestName : string = 'Misc';
 
 async function moveData(currPath : string, newPath : string){
-    rename(currPath, newPath, (err) => {
+    await rename(currPath, newPath, (err) => {
         if (err) {
             console.log(err);
         } else {
             console.log(
-                `moved file : ${currPath}} to ${newPath}`
+                `moved file : ${currPath} to ${newPath}`
             );
         }
     });
@@ -21,11 +21,7 @@ async function manageFiles(dirent: Dirent) {
     const fileExtension = fileNameSplit[fileNameSplit.length - 1];
     const newPath = `${folderName}\\${fileExtension}s`;
     const newDir = await mkdir(newPath, { recursive: true });
-    opendir(newPath).then(() => {
-        moveData(`${folderName}\\${dirent.name}`, `${newPath}\\${dirent.name}`);
-    }).catch((err) => {
-        console.log(err.message);
-    });
+    moveData(`${folderName}\\${dirent.name}`, `${newPath}\\${dirent.name}`);
 }
 
 async function manageFolders(dirent: Dirent) {
@@ -38,7 +34,7 @@ async function manageDownloads() {
         const dir = await opendir(folderName);
         for await (const dirent of dir) {
             if (dirent.isFile()) {
-                manageFiles(dirent);
+                await manageFiles(dirent);
             } else {
                 // add folder management
                 continue;
@@ -47,9 +43,9 @@ async function manageDownloads() {
     } catch (err) {
         console.log(err);
     }
+    console.log('done');
 }
 
 (async () => {
     await manageDownloads();
 })();
-console.log('done');
